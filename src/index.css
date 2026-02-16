@@ -1,0 +1,108 @@
+@import "tailwindcss";
+
+@theme {
+  --font-outfit: 'Outfit', sans-serif;
+  --color-primary: #7c3aed;
+  --color-primary-light: #a78bfa;
+  --color-primary-dark: #5b21b6;
+  --color-accent: #f59e0b;
+  --color-accent-light: #fbbf24;
+  --color-surface: rgba(30, 27, 75, 0.85);
+  --color-surface-light: rgba(55, 48, 107, 0.7);
+  --color-danger: #ef4444;
+  --color-success: #10b981;
+}
+
+/* ---- Global ---- */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Outfit', sans-serif;
+  background: linear-gradient(135deg, #0f0c29 0%, #1a1145 40%, #302b63 70%, #24243e 100%);
+  min-height: 100dvh;
+  color: #e2e8f0;
+  overflow-x: hidden;
+}
+
+/* ---- Scrollbar ---- */
+::-webkit-scrollbar {
+  width: 4px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(124, 58, 237, 0.4);
+  border-radius: 99px;
+}
+
+/* ---- Canvas pointer indicator triangle ---- */
+.wheel-pointer {
+  filter: drop-shadow(0 0 8px rgba(245, 158, 11, 0.8));
+}
+
+/* ---- Glass Card ---- */
+.glass-card {
+  background: rgba(30, 27, 75, 0.6);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(124, 58, 237, 0.25);
+  border-radius: 1.25rem;
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+/* ---- Glow pulse animation ---- */
+@keyframes glow-pulse {
+  0%, 100% { box-shadow: 0 0 15px rgba(124, 58, 237, 0.4), 0 0 30px rgba(124, 58, 237, 0.1); }
+  50% { box-shadow: 0 0 25px rgba(124, 58, 237, 0.6), 0 0 50px rgba(124, 58, 237, 0.2); }
+}
+
+.glow-pulse {
+  animation: glow-pulse 2s ease-in-out infinite;
+}
+
+/* ---- Spin button gradient animation ---- */
+@keyframes gradient-shift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.spin-btn {
+  background: linear-gradient(135deg, #7c3aed, #f59e0b, #ec4899, #7c3aed);
+  background-size: 300% 300%;
+  animation: gradient-shift 4s ease infinite;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.spin-btn:hover:not(:disabled) {
+  transform: scale(1.05);
+  box-shadow: 0 0 30px rgba(124, 58, 237, 0.5);
+}
+.spin-btn:active:not(:disabled) {
+  transform: scale(0.97);
+}
+.spin-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  animation: none;
+  background: #4b5563;
+}
+
+/* ---- Modal overlay ---- */
+.modal-overlay {
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}

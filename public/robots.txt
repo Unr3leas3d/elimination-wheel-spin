@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://unr3leas3d.github.io/elimination-wheel-spin/sitemap.xml
