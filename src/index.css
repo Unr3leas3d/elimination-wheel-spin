@@ -22,11 +22,14 @@
 
 html {
   -webkit-tap-highlight-color: transparent;
+  background: #0f0c29;
+  min-height: 100dvh;
 }
 
 body {
   margin: 0;
   padding: 0;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
   font-family: 'Outfit', sans-serif;
   background: linear-gradient(135deg, #0f0c29 0%, #1a1145 40%, #302b63 70%, #24243e 100%);
   min-height: 100dvh;
@@ -100,9 +103,29 @@ body {
   background: #4b5563;
 }
 
-/* ---- Modal overlay ---- */
-.modal-overlay {
+/* ---- Radix Dialog overlay ---- */
+.dialog-overlay {
   background: rgba(0, 0, 0, 0.7);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
+}
+
+/* ---- Radix Collapsible animation ---- */
+.collapsible-content {
+  overflow: hidden;
+  transition: max-height 0.4s ease-in-out, opacity 0.4s ease-in-out;
+}
+.collapsible-content[data-state='closed'] {
+  max-height: 0;
+  opacity: 0;
+}
+.collapsible-content[data-state='open'] {
+  max-height: 800px;
+  opacity: 1;
+}
+
+/* ---- Radix Separator ---- */
+.radix-separator {
+  background: rgba(124, 58, 237, 0.15);
+  height: 1px;
 }

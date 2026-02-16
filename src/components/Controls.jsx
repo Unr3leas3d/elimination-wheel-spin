@@ -1,4 +1,6 @@
 import { useState } from 'react'
+import * as Separator from '@radix-ui/react-separator'
+import * as VisuallyHidden from '@radix-ui/react-visually-hidden'
 
 const MAX_ENTRIES = 12
 
@@ -33,6 +35,9 @@ export default function Controls({ entries, onAddEntry, onRemoveEntry, disabled 
         <div className="space-y-3">
             {/* Input row */}
             <div className="flex gap-2">
+                <label htmlFor="entry-input">
+                    <VisuallyHidden.Root>Enter participant name</VisuallyHidden.Root>
+                </label>
                 <input
                     id="entry-input"
                     type="text"
@@ -63,7 +68,7 @@ export default function Controls({ entries, onAddEntry, onRemoveEntry, disabled 
 
             {/* Error */}
             {error && (
-                <p className="text-red-400 text-xs font-medium px-1">{error}</p>
+                <p className="text-red-400 text-xs font-medium px-1" role="alert">{error}</p>
             )}
 
             {/* Entry count */}
@@ -72,6 +77,8 @@ export default function Controls({ entries, onAddEntry, onRemoveEntry, disabled 
                     {entries.length} / {MAX_ENTRIES} entries
                 </span>
             </div>
+
+            <Separator.Root className="radix-separator" decorative />
 
             {/* Entry chips */}
             <div className="flex flex-wrap gap-2">
