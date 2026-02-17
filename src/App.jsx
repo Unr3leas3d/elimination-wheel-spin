@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import confetti from 'canvas-confetti'
 import Wheel from './components/Wheel'
 import Controls from './components/Controls'
@@ -6,13 +6,52 @@ import EliminationTracker from './components/EliminationTracker'
 import Modal from './components/Modal'
 import SEOContent from './components/SEOContent'
 
+// Helper to safely encode/decode Base64 with Unicode support
+const encodeChoices = (choices) => {
+    try {
+        return btoa(unescape(encodeURIComponent(choices.join(','))))
+    } catch (e) {
+        console.error('Error encoding choices:', e)
+        return ''
+    }
+}
+
+const decodeChoices = (encoded) => {
+    try {
+        const decoded = decodeURIComponent(escape(atob(encoded)))
+        return decoded ? decoded.split(',') : []
+    } catch (e) {
+        console.error('Error decoding choices:', e)
+        return []
+    }
+}
+
 export default function App() {
-    const [entries, setEntries] = useState([])
+    const [entries, setEntries] = useState(() => {
+        const params = new URLSearchParams(window.location.search)
+        const choicesParam = params.get('choices')
+        if (choicesParam) {
+            return decodeChoices(choicesParam)
+        }
+        return []
+    })
+
     const [eliminated, setEliminated] = useState([])
     const [isSpinning, setIsSpinning] = useState(false)
     const [selectedName, setSelectedName] = useState(null)
     const [showModal, setShowModal] = useState(false)
     const [isWinner, setIsWinner] = useState(false)
+
+    // Sync entries to URL
+    useEffect(() => {
+        const url = new URL(window.location)
+        if (entries.length > 0) {
+            url.searchParams.set('choices', encodeChoices(entries))
+        } else {
+            url.searchParams.delete('choices')
+        }
+        window.history.replaceState({}, '', url)
+    }, [entries])
 
     const handleAddEntry = (name) => {
         setEntries((prev) => [...prev, name])
