@@ -36,13 +36,20 @@ export default function App() {
         return []
     })
 
-    const [eliminated, setEliminated] = useState([])
+    const [eliminated, setEliminated] = useState(() => {
+        const params = new URLSearchParams(window.location.search)
+        const eliminatedParam = params.get('eliminated')
+        if (eliminatedParam) {
+            return decodeChoices(eliminatedParam)
+        }
+        return []
+    })
     const [isSpinning, setIsSpinning] = useState(false)
     const [selectedName, setSelectedName] = useState(null)
     const [showModal, setShowModal] = useState(false)
     const [isWinner, setIsWinner] = useState(false)
 
-    // Sync entries to URL
+    // Sync entries and eliminated to URL
     useEffect(() => {
         const url = new URL(window.location)
         if (entries.length > 0) {
@@ -50,8 +57,15 @@ export default function App() {
         } else {
             url.searchParams.delete('choices')
         }
+        
+        if (eliminated.length > 0) {
+            url.searchParams.set('eliminated', encodeChoices(eliminated))
+        } else {
+            url.searchParams.delete('eliminated')
+        }
+        
         window.history.replaceState({}, '', url)
-    }, [entries])
+    }, [entries, eliminated])
 
     const handleAddEntry = (name) => {
         setEntries((prev) => [...prev, name])
