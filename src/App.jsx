@@ -5,45 +5,14 @@ import Controls from './components/Controls'
 import EliminationTracker from './components/EliminationTracker'
 import Modal from './components/Modal'
 import SEOContent from './components/SEOContent'
+import { decodeNames, encodeNames, MAX_ELIMINATED, MAX_ENTRIES } from './lib/entries'
 
-// Helper to safely encode/decode Base64 with Unicode support
-const encodeChoices = (choices) => {
-    try {
-        return btoa(unescape(encodeURIComponent(choices.join(','))))
-    } catch (e) {
-        console.error('Error encoding choices:', e)
-        return ''
-    }
-}
-
-const decodeChoices = (encoded) => {
-    try {
-        const decoded = decodeURIComponent(escape(atob(encoded)))
-        return decoded ? decoded.split(',') : []
-    } catch (e) {
-        console.error('Error decoding choices:', e)
-        return []
-    }
-}
+const readNamesParam = (key, limit) =>
+    decodeNames(new URLSearchParams(window.location.search).get(key), limit)
 
 export default function App() {
-    const [entries, setEntries] = useState(() => {
-        const params = new URLSearchParams(window.location.search)
-        const choicesParam = params.get('choices')
-        if (choicesParam) {
-            return decodeChoices(choicesParam)
-        }
-        return []
-    })
-
-    const [eliminated, setEliminated] = useState(() => {
-        const params = new URLSearchParams(window.location.search)
-        const eliminatedParam = params.get('eliminated')
-        if (eliminatedParam) {
-            return decodeChoices(eliminatedParam)
-        }
-        return []
-    })
+    const [entries, setEntries] = useState(() => readNamesParam('choices', MAX_ENTRIES))
+    const [eliminated, setEliminated] = useState(() => readNamesParam('eliminated', MAX_ELIMINATED))
     const [isSpinning, setIsSpinning] = useState(false)
     const [selectedName, setSelectedName] = useState(null)
     const [showModal, setShowModal] = useState(false)
@@ -53,17 +22,17 @@ export default function App() {
     useEffect(() => {
         const url = new URL(window.location)
         if (entries.length > 0) {
-            url.searchParams.set('choices', encodeChoices(entries))
+            url.searchParams.set('choices', encodeNames(entries))
         } else {
             url.searchParams.delete('choices')
         }
-        
+
         if (eliminated.length > 0) {
-            url.searchParams.set('eliminated', encodeChoices(eliminated))
+            url.searchParams.set('eliminated', encodeNames(eliminated))
         } else {
             url.searchParams.delete('eliminated')
         }
-        
+
         window.history.replaceState({}, '', url)
     }, [entries, eliminated])
 
@@ -82,44 +51,39 @@ export default function App() {
 
     const handleSpinEnd = useCallback((name) => {
         setIsSpinning(false)
-        setSelectedName(name)
 
-        // Check if this is the second-to-last entry (winner will be the remaining one)
+        // With two entries left, eliminating one leaves the winner
         if (entries.length === 2) {
-            // The remaining entry after elimination is the winner
-            const winner = entries.find((e) => e !== name)
-            setSelectedName(winner)
+            setSelectedName(entries.find((e) => e !== name))
             setIsWinner(true)
             setShowModal(true)
-            // Remove the eliminated one
             setEliminated((prev) => [...prev, name])
             setEntries((prev) => prev.filter((e) => e !== name))
-            // Confetti for winner!
             confetti({
                 particleCount: 150,
                 spread: 80,
                 origin: { y: 0.6 },
                 colors: ['#7c3aed', '#f59e0b', '#ec4899', '#10b981', '#3b82f6'],
+                disableForReducedMotion: true,
             })
         } else {
+            setSelectedName(name)
             setIsWinner(false)
             setShowModal(true)
         }
     }, [entries])
 
+    // Name and winner state are left in place so the modal keeps its content while it animates out
     const handleConfirmElimination = () => {
         setEliminated((prev) => [...prev, selectedName])
         setEntries((prev) => prev.filter((e) => e !== selectedName))
-        setSelectedName(null)
         setShowModal(false)
     }
 
     const handleReset = () => {
         setEntries([])
         setEliminated([])
-        setSelectedName(null)
         setShowModal(false)
-        setIsWinner(false)
     }
 
     const canSpin = entries.length >= 2 && !isSpinning
@@ -148,9 +112,8 @@ export default function App() {
                         className={`w-full py-3.5 rounded-xl font-bold text-base tracking-wide uppercase
                             transition-all duration-300 ${canSpin
                                 ? 'spin-btn text-white'
-                                : 'bg-white/5 border border-white/10 text-white/25 cursor-not-allowed'
+                                : 'bg-white/5 border border-white/10 text-white/60 cursor-not-allowed'
                             }`}
-                        aria-label={isSpinning ? "Wheel is spinning" : entries.length < 2 ? "Add at least 2 entries" : "Spin the wheel"}
                     >
                         {isSpinning ? 'Spinning…' : entries.length < 2 ? `Add ${2 - entries.length} more entr${2 - entries.length === 1 ? 'y' : 'ies'}` : 'Spin the Wheel'}
                     </button>
@@ -171,8 +134,8 @@ export default function App() {
                         <button
                             id="reset-game-btn"
                             onClick={handleReset}
-                            className="w-full py-2.5 rounded-xl border border-white/10 text-white/40
-                           text-sm font-medium hover:text-white/70 hover:border-white/20
+                            className="w-full py-2.5 rounded-xl border border-white/15 text-white/70
+                           text-sm font-medium hover:text-white hover:border-white/30
                            transition-all active:scale-95"
                         >
                             Reset Game

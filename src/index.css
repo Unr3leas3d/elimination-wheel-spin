@@ -1,18 +1,5 @@
 @import "tailwindcss";
 
-@theme {
-  --font-outfit: 'Outfit', sans-serif;
-  --color-primary: #7c3aed;
-  --color-primary-light: #a78bfa;
-  --color-primary-dark: #5b21b6;
-  --color-accent: #f59e0b;
-  --color-accent-light: #fbbf24;
-  --color-surface: rgba(30, 27, 75, 0.85);
-  --color-surface-light: rgba(55, 48, 107, 0.7);
-  --color-danger: #ef4444;
-  --color-success: #10b981;
-}
-
 /* ---- Global ---- */
 *,
 *::before,
@@ -28,7 +15,6 @@ html {
 
 body {
   margin: 0;
-  padding: 0;
   padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
   font-family: 'Outfit', sans-serif;
   background: linear-gradient(135deg, #0f0c29 0%, #1a1145 40%, #302b63 70%, #24243e 100%);
@@ -66,16 +52,6 @@ body {
     inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
 
-/* ---- Glow pulse animation ---- */
-@keyframes glow-pulse {
-  0%, 100% { box-shadow: 0 0 15px rgba(124, 58, 237, 0.4), 0 0 30px rgba(124, 58, 237, 0.1); }
-  50% { box-shadow: 0 0 25px rgba(124, 58, 237, 0.6), 0 0 50px rgba(124, 58, 237, 0.2); }
-}
-
-.glow-pulse {
-  animation: glow-pulse 2s ease-in-out infinite;
-}
-
 /* ---- Spin button gradient animation ---- */
 @keyframes gradient-shift {
   0% { background-position: 0% 50%; }
@@ -96,36 +72,84 @@ body {
 .spin-btn:active:not(:disabled) {
   transform: scale(0.97);
 }
-.spin-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-  animation: none;
-  background: #4b5563;
+
+/* ---- Shared keyframes ---- */
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes fade-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+@keyframes pop-in {
+  from { opacity: 0; transform: translateY(30px) scale(0.7); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes pop-out {
+  from { opacity: 1; transform: none; }
+  to { opacity: 0; transform: translateY(30px) scale(0.7); }
 }
 
-/* ---- Radix Dialog overlay ---- */
+/* ---- Radix Dialog ---- */
 .dialog-overlay {
   background: rgba(0, 0, 0, 0.7);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
 }
+.dialog-overlay[data-state='open'],
+.dialog-content[data-state='open'] {
+  animation: fade-in 200ms ease-out;
+}
+.dialog-overlay[data-state='closed'],
+.dialog-content[data-state='closed'] {
+  animation: fade-out 180ms ease-in forwards;
+}
+.dialog-content[data-state='open'] .dialog-card {
+  animation: pop-in 350ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.dialog-content[data-state='closed'] .dialog-card {
+  animation: pop-out 180ms ease-in forwards;
+}
 
-/* ---- Radix Collapsible animation ---- */
-.collapsible-content {
-  overflow: hidden;
-  transition: max-height 0.4s ease-in-out, opacity 0.4s ease-in-out;
+/* ---- Eliminated chips ---- */
+.chip-pop {
+  animation: pop-in 300ms cubic-bezier(0.34, 1.56, 0.64, 1);
 }
-.collapsible-content[data-state='closed'] {
-  max-height: 0;
+
+/* ---- About section disclosure ---- */
+.disclosure-content {
+  display: grid;
+  grid-template-rows: 0fr;
   opacity: 0;
+  transition: grid-template-rows 0.4s ease-in-out, opacity 0.4s ease-in-out;
 }
-.collapsible-content[data-state='open'] {
-  max-height: 800px;
+.disclosure-content[data-state='open'] {
+  grid-template-rows: 1fr;
   opacity: 1;
+}
+.disclosure-content > div {
+  min-height: 0;
+  overflow: hidden;
 }
 
 /* ---- Radix Separator ---- */
 .radix-separator {
   background: rgba(124, 58, 237, 0.15);
   height: 1px;
+}
+
+/* ---- Reduced motion ---- */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 1ms !important;
+  }
+  .spin-btn:hover:not(:disabled),
+  .spin-btn:active:not(:disabled) {
+    transform: none;
+  }
 }
